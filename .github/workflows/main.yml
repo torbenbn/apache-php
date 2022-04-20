@@ -3,36 +3,46 @@ name: ci
 on:
   workflow_dispatch:
   push:
-    branches: master
+    branches: main
 
 jobs:
   main:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Checkout
+      - name: Checkout
         uses: actions/checkout@v2
-      -
-        name: Set up QEMU
+      - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
-      -
-        name: Set up Docker Buildx
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
-      -
-        name: Login to DockerHub
+      - name: Login to DockerHub
         uses: docker/login-action@v1 
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      -
-        name: Build and push
+      - name: Docker meta
+        id: apache-php-tag
+        uses: docker/metadata-action@v3
+        with:
+          images: |
+            torbenbn/apache-php
+          tags: |
+            type=schedule
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=sha
+      - name: Build and push
         id: docker_build
         uses: docker/build-push-action@v2
         with:
           context: .
           file: ./Dockerfile
-          push: true
-          tags: torbenbn/apache-php:latest
-      -
-        name: Image digest
+          platforms: linux/amd64,linux/arm/v8
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.apache-php-tag.outputs.tags }}
+          labels: ${{ steps.apache-php-tag.outputs.labels }}
+      - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
