@@ -1,2 +1,2 @@
 # apache-php
-Simple apache2 and PHP container allowing the UID/GID of the www-data user to be specified
+Simple apache2 and PHP container based on the standard httpd image
