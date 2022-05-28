@@ -1,4 +1,4 @@
-FROM httpd:2.4
+FROM ubuntu/apache2:latest
 
 EXPOSE 80
 VOLUME [ "/var/www" ]
