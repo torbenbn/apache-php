@@ -40,7 +40,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64,linux/arm/v8
+          platforms: linux/amd64,linux/arm64/v8
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.apache-php-tag.outputs.tags }}
           labels: ${{ steps.apache-php-tag.outputs.labels }}
